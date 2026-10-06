@@ -1,0 +1,821 @@
+{
+  "info": {
+    "_postman_id": "00d9ac7d-25ed-459d-8cff-55cd7a0a8ac8",
+    "name": "CoffeeNChill API - Part 1",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58092060"
+  },
+  "item": [
+    {
+      "name": "Menu Management",
+      "item": [
+        {
+          "name": "Staff Documents",
+          "item": [
+            {
+              "name": "Upload Staff Document",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\nconst jsonData = pm.response.json();\r\n\r\npm.test(\"Response contains file name\", function () {\r\n    pm.expect(jsonData).to.have.property(\"fileName\");\r\n});\r\n\r\npm.test(\"Response contains file size\", function () {\r\n    pm.expect(jsonData).to.have.property(\"fileSize\");\r\n});\r\n\r\npm.test(\"Response contains content type\", function () {\r\n    pm.expect(jsonData).to.have.property(\"contentType\");\r\n    pm.expect(jsonData.contentType).to.eql(\"application/pdf\");\r\n});\r\n\r\npm.test(\"Response contains upload date\", function () {\r\n    pm.expect(jsonData).to.have.property(\"uploadedOn\");\r\n});\r\n\r\npm.collectionVariables.set(\"uploadedFileName\", jsonData.fileName);"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "src": [
+                        "Student_Library_Management_System_Task.pdf"
+                      ]
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/api/documents/upload",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "documents",
+                    "upload"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "List Staff Documents",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\nconst jsonData = pm.response.json();\r\n\r\npm.test(\"Response is an array\", function () {\r\n    pm.expect(jsonData).to.be.an(\"array\");\r\n});\r\n\r\npm.test(\"Uploaded document is listed\", function () {\r\n    const uploadedFileName = pm.collectionVariables.get(\"fileName\");\r\n\r\n    const documentExists = jsonData.some(function (document) {\r\n        return document.FileName === uploadedFileName;\r\n    });\r\n\r\n    pm.expect(documentExists).to.eql(true);\r\n});\r\n\r\npm.test(\"Document contains required metadata\", function () {\r\n    const uploadedFileName = pm.collectionVariables.get(\"fileName\");\r\n\r\n    const document = jsonData.find(function (item) {\r\n        return item.FileName === uploadedFileName;\r\n    });\r\n\r\n    pm.expect(document).to.have.property(\"FileName\");\r\n    pm.expect(document).to.have.property(\"FileSize\");\r\n    pm.expect(document).to.have.property(\"ContentType\");\r\n    pm.expect(document).to.have.property(\"UploadedOn\");\r\n});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/documents",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "documents"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "List Staff Documents - After Delete",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\nconst jsonData = pm.response.json();\r\n\r\npm.test(\"Response is an array\", function () {\r\n    pm.expect(jsonData).to.be.an(\"array\");\r\n});\r\n\r\npm.test(\"Deleted document is no longer listed\", function () {\r\n    const deletedFileName = pm.collectionVariables.get(\"uploadedFileName\");\r\n\r\n    const documentExists = jsonData.some(function (document) {\r\n        return document.FileName === deletedFileName;\r\n    });\r\n\r\n    pm.expect(documentExists).to.eql(false);\r\n});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/documents",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "documents"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Download Staff Document",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": ""
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Staff Document",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/documents/{{uploadedFileName}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "documents",
+                    "{{uploadedFileName}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Staff Document - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});\r\n\r\npm.test(\"Not found message is returned\", function () {\r\n    const jsonData = pm.response.json();\r\n\r\n    pm.expect(jsonData).to.have.property(\"error\");\r\n    pm.expect(jsonData.error).to.include(\"not found\");\r\n});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/documents/does-not-exist.pdf",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "documents",
+                    "does-not-exist.pdf"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Download Staff Document - 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});\r\n\r\npm.test(\"Not found message is returned\", function () {\r\n    const jsonData = pm.response.json();\r\n\r\n    pm.expect(jsonData).to.have.property(\"message\");\r\n    pm.expect(jsonData.message).to.eql(\"The requested document was not found.\");\r\n});"
+                    ]
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/documents/download/does-not-exist.pdf",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "documents",
+                    "download",
+                    "does-not-exist.pdf"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Create Menu Item",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const uniqueSku = \"C\" + Date.now().toString().slice(-6);\r",
+                  "pm.collectionVariables.set(\"testCategory\", \"Coffee\");\r",
+                  "pm.collectionVariables.set(\"testSku\", uniqueSku);\r",
+                  "\r",
+                  "console.log(\"Test Category:\", pm.collectionVariables.get(\"testCategory\"));\r",
+                  "console.log(\"Test SKU:\", pm.collectionVariables.get(\"testSku\"));"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains menu item\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(jsonData).to.have.property(\"Category\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"SKU\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"Name\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"Price\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"IsAvailable\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Created SKU matches generated SKU\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(jsonData.SKU).to.eql(\r",
+                  "        pm.collectionVariables.get(\"testSku\")\r",
+                  "    );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"category\": \"{{testCategory}}\",\r\n  \"sku\": \"{{testSku}}\",\r\n  \"name\": \"Cappuccino\",\r\n  \"description\": \"Espresso with steamed milk\",\r\n  \"price\": 45,\r\n  \"isAvailable\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/menu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Menu Item - Duplicate SKU",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {\r\n    pm.response.to.have.status(201);\r\n});\r\n\r\npm.test(\"Response contains menu item\", function () {\r\n    const jsonData = pm.response.json();\r\n\r\n    pm.expect(jsonData).to.have.property(\"Category\");\r\n    pm.expect(jsonData).to.have.property(\"SKU\");\r\n    pm.expect(jsonData).to.have.property(\"Name\");\r\n    pm.expect(jsonData).to.have.property(\"Price\");\r\n    pm.expect(jsonData).to.have.property(\"IsAvailable\");\r\n});\r\n\r\npm.test(\"Created SKU matches generated SKU\", function () {\r\n    const jsonData = pm.response.json();\r\n\r\n    pm.expect(jsonData.SKU).to.eql(\r\n        pm.collectionVariables.get(\"testSku\")\r\n    );\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"category\": \"{{testCategory}}\",\r\n  \"sku\": \"C999997\",\r\n  \"name\": \"Duplicate Test Coffee\",\r\n  \"description\": \"Duplicate SKU validation test\",\r\n  \"price\": 45,\r\n  \"isAvailable\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/menu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Menu Item - Missing SKU",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r\n    pm.response.to.have.status(400);\r\n});\r\n\r\npm.test(\"Error message is returned\", function () {\r\n    const jsonData = pm.response.json();\r\n\r\n    pm.expect(jsonData).to.have.property(\"error\");\r\n    pm.expect(jsonData.error).to.include(\"SKU\");\r\n});\r\n\r\npm.test(\"SKU validation is enforced\", function () {\r\n    const jsonData = pm.response.json();\r\n\r\n    pm.expect(jsonData.error).to.eql(\"SKU is required.\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"category\": \"{{testCategory}}\",\r\n  \"sku\": \"\",\r\n  \"name\": \"Missing SKU Coffee\",\r\n  \"description\": \"Missing SKU validation test\",\r\n  \"price\": 45,\r\n  \"isAvailable\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/menu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Menu Item - Missing Name",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const uniqueSku = \"C\" + Date.now().toString().slice(-6);\r\npm.collectionVariables.set(\"testCategory\", \"Coffee\");\r\npm.collectionVariables.set(\"testSku\", uniqueSku);\r\n\r\nconsole.log(\"Test Category:\", pm.collectionVariables.get(\"testCategory\"));\r\nconsole.log(\"Test SKU:\", pm.collectionVariables.get(\"testSku\"));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r\n    pm.response.to.have.status(400);\r\n});\r\n\r\npm.test(\"Error message is returned\", function () {\r\n    const jsonData = pm.response.json();\r\n\r\n    pm.expect(jsonData).to.have.property(\"error\");\r\n    pm.expect(jsonData.error).to.include(\"name\");\r\n});\r\n\r\npm.test(\"Name validation is enforced\", function () {\r\n    const jsonData = pm.response.json();\r\n\r\n    pm.expect(jsonData.error).to.eql(\"Name is required.\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"category\": \"{{testCategory}}\",\r\n  \"sku\": \"C999998\",\r\n  \"name\": \"\",\r\n  \"description\": \"Missing name validation test\",\r\n  \"price\": 45,\r\n  \"isAvailable\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/menu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Menu Item - Invalid Price",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  ""
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 400\", function () {\r\n    pm.response.to.have.status(400);\r\n});\r\n\r\npm.test(\"Error message is returned\", function () {\r\n    const jsonData = pm.response.json();\r\n\r\n    pm.expect(jsonData).to.have.property(\"error\");\r\n    pm.expect(jsonData.error).to.include(\"price\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"category\": \"{{testCategory}}\",\r\n  \"sku\": \"C999999\",\r\n  \"name\": \"Invalid Price Coffee\",\r\n  \"description\": \"Negative price test\",\r\n  \"price\": -10,\r\n  \"isAvailable\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/menu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Menu Items",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Menu items contain required fields\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "\r",
+                  "    jsonData.forEach(item => {\r",
+                  "        pm.expect(item).to.have.property(\"Category\");\r",
+                  "        pm.expect(item).to.have.property(\"SKU\");\r",
+                  "        pm.expect(item).to.have.property(\"Name\");\r",
+                  "        pm.expect(item).to.have.property(\"Price\");\r",
+                  "        pm.expect(item).to.have.property(\"IsAvailable\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Menu Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contains requested menu item\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(jsonData).to.have.property(\"Category\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"SKU\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"Name\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"Description\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"Price\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"IsAvailable\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returned item matches requested SKU\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(jsonData.SKU).to.eql(\r",
+                  "        pm.collectionVariables.get(\"testSku\")\r",
+                  "    );\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returned item matches requested category\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(jsonData.Category).to.eql(\r",
+                  "        pm.collectionVariables.get(\"testCategory\")\r",
+                  "    );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/item/{{testCategory}}/{{testSku}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu",
+                "item",
+                "{{testCategory}}",
+                "{{testSku}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Menu Items By Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response is an array\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    pm.expect(jsonData).to.be.an(\"array\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"All returned items belong to requested category\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "    const category = pm.collectionVariables.get(\"testCategory\");\r",
+                  "\r",
+                  "    jsonData.forEach(item => {\r",
+                  "        pm.expect(item.Category).to.eql(category);\r",
+                  "    });\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Returned items contain required fields\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "\r",
+                  "    jsonData.forEach(item => {\r",
+                  "        pm.expect(item).to.have.property(\"Category\");\r",
+                  "        pm.expect(item).to.have.property(\"SKU\");\r",
+                  "        pm.expect(item).to.have.property(\"Name\");\r",
+                  "        pm.expect(item).to.have.property(\"Price\");\r",
+                  "        pm.expect(item).to.have.property(\"IsAvailable\");\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/category/{{testCategory}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu",
+                "category",
+                "{{testCategory}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Menu Item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Updated menu item contains required fields\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(jsonData).to.have.property(\"Category\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"SKU\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"Name\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"Description\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"Price\");\r",
+                  "    pm.expect(jsonData).to.have.property(\"IsAvailable\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Menu item was updated correctly\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(jsonData.Name).to.eql(\"Updated Cappuccino\");\r",
+                  "    pm.expect(jsonData.Description).to.eql(\r",
+                  "        \"Updated espresso with steamed milk\"\r",
+                  "    );\r",
+                  "    pm.expect(jsonData.Price).to.eql(50);\r",
+                  "    pm.expect(jsonData.IsAvailable).to.eql(true);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Updated item matches requested SKU\", function () {\r",
+                  "    const jsonData = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(jsonData.SKU).to.eql(\r",
+                  "        pm.collectionVariables.get(\"testSku\")\r",
+                  "    );\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Updated Cappuccino\",\r\n  \"description\": \"Updated espresso with steamed milk\",\r\n  \"price\": 50,\r\n  \"isAvailable\": true\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/{{testCategory}}/{{testSku}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu",
+                "{{testCategory}}",
+                "{{testSku}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Menu Item",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/{{testCategory}}/{{testSku}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu",
+                "{{testCategory}}",
+                "{{testSku}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Deleted Menu Item - 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 404\", function () {\r\n    pm.response.to.have.status(404);\r\n});\r\n\r\npm.test(\"Error message is returned\", function () {\r\n    const jsonData = pm.response.json();\r\n\r\n    pm.expect(jsonData).to.have.property(\"error\");\r\n    pm.expect(jsonData.error).to.eql(\"Menu item not found.\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/menu/item/{{testCategory}}/{{testSku}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "menu",
+                "item",
+                "{{testCategory}}",
+                "{{testSku}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": ""
+    },
+    {
+      "key": "testCategory ",
+      "value": ""
+    },
+    {
+      "key": "testSku",
+      "value": ""
+    },
+    {
+      "key": "testCategory",
+      "value": ""
+    },
+    {
+      "key": "uploadedFileName",
+      "value": ""
+    }
+  ]
+}
